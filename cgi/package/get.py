@@ -96,6 +96,35 @@ def get_indexlist_prefix(SH,SZ,pre=1):
                 pflist.append(symbol+SZ)
     return pflist
 
+def realtime(code):
+    # ===================set requests================== #
+    rqs = rq.session()
+    rqs.keep_alive = False
+    rqshead = {'User-Agent':'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.118 Safari/537.36'}
+    # ===================get requests================== #
+    urlsina = "http://hq.sinajs.cn/list=%s"%(code)
+    lastbar = str(rq.get(urlsina,headers=rqshead).content)
+    # ===================data processing================== #
+    dayline = []
+    for i in ('_','=','sz','sh'):
+        lastbar = lastbar.replace(i,',')
+    lastbar_sp =lastbar.split(',')
+    dayline.append(lastbar_sp)
+    dayline = pd.DataFrame(dayline,columns=['a','b','c','code','d','open','preclose','close','high','low','e','f','vol','amo','g','h','I','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','date','aa','ab'])
+    if dayline.get_value(0,'ab')[0:2]=='00':
+        dailybar_dtype = dayline.loc[:,['code','date','open','close','high','low','vol','amo','preclose']]
+        dailybar_dtype['date'] = dailybar_dtype['date'].astype('datetime64')
+        dailybar_dtype['close'] = dailybar_dtype['close'].astype('float32')
+        dailybar_dtype['high'] = dailybar_dtype['high'].astype('float32')
+        dailybar_dtype['low'] = dailybar_dtype['low'].astype('float32')
+        dailybar_dtype['open'] = dailybar_dtype['open'].astype('float32')
+        dailybar_dtype['vol'] = dailybar_dtype['vol'].astype('float32')
+        dailybar_dtype['amo'] = dailybar_dtype['amo'].astype('float32')
+        dailybar = dailybar_dtype[dailybar_dtype['vol']>0]
+    else:
+        dailybar = pd.DataFrame()
+    return dailybar
+
 if __name__== "__main__":
     list = get_df_stocklist()
 

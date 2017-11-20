@@ -117,3 +117,18 @@ def getpinyin(string):
         except:
             charLst.append(single_get_first(l))
     return ''.join(charLst)
+
+
+def round45(sFloat):
+    try:
+        a = IsValidFloat(sFloat)
+        a = (int(a * 100 + 0.5)) / 100
+        return a
+    except:
+        return False
+
+def comparetime():
+    time_open = 93001
+    time_close = 191501
+    now = int(time.strftime("%H%M%S"))
+    return now >= time_open and now < time_close
